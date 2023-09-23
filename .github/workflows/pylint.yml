@@ -1,6 +1,9 @@
-name: Pylint
+name: pylint
 
-on: [push]
+on:
+  push:
+    branches:
+      - master  # You can specify the branch you want to trigger this workflow
 
 jobs:
   build:
@@ -9,9 +12,9 @@ jobs:
       matrix:
         python-version: ["3.8", "3.9", "3.10"]
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v2  # Use v2 instead of v3 if it works for your project
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v2  # Use v2 instead of v3 if it works for your project
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
@@ -20,4 +23,9 @@ jobs:
         pip install pylint
     - name: Analysing the code with pylint
       run: |
-        pylint $(git ls-files '*.py')
+        pylint --output-format=json my_project_directory/ > pylint-report.json
+    - name: Upload Pylint Report as Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: pylint-report
+        path: pylint-report.json
